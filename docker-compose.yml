@@ -6,7 +6,7 @@ services:
     command: python init_db.py
     environment:
       - DB_HOST=db
-      - DB_USER=postgre
+      - DB_USER=postgres
       - DB_PASSWORD=1111
       - DB_NAME=visitsdb
     depends_on:
