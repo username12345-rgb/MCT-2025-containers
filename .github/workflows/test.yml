@@ -63,8 +63,8 @@ jobs:
       - name: Verify data in Redis
         run: |
           count=$(docker compose exec -T redis redis-cli GET total_visits)
-          if [[ "$count" != "2" ]]; then
-            echo "Expected total_visits=2 in Redis, got: $count"
+          if [[ "$count" != "3" ]]; then
+            echo "Expected total_visits=3 in Redis, got: $count"
             exit 1
           fi
           echo "Redis cache verified"
