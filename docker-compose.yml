@@ -1,6 +1,10 @@
 version: '3.8'
 
 services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+
   init-db:
     build: ./
     command: python init_db.py
@@ -9,8 +13,10 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=1111
       - DB_NAME=visitsdb
+      - REDIS_HOST=redis
     depends_on:
       - db
+      - redis
     restart: "no"
 
   app:
@@ -22,6 +28,7 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=1111
       - DB_NAME=visitsdb
+      - REDIS_HOST=redis
     depends_on:
       init-db:
         condition: service_completed_successfully
