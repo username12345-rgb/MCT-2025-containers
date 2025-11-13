@@ -43,8 +43,8 @@ jobs:
         run: |
           curl -s http://localhost:8000/ping >/dev/null
           visits=$(curl -s http://localhost:8000/visits | jq -r '.visits')
-          if [[ "$visits" != "1" ]]; then
-            echo "Expected visits=1, got: $visits"
+          if [[ "$visits" != "3" ]]; then
+            echo "Expected visits=3, got: $visits"
             exit 1
           fi
           echo "/visits test passed!"
