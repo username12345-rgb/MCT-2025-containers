@@ -97,3 +97,49 @@ jobs:
       - name: Show logs on failure
         if: failure()
         run: docker compose logs
+  test-dev:
+    name: Test Development Environment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker images
+        run: docker compose build
+
+      - name: Start app in dev mode
+        run: |
+          docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+
+      - name: Wait for dev app to be ready
+        run: |
+          timeout=30
+          while ! curl -f http://localhost:8000/ping >/dev/null 2>&1; do
+            ((timeout--))
+            if [ $timeout -eq 0 ]; then
+              echo "Dev app failed to start"
+              exit 1
+            fi
+            sleep 1
+          done
+
+      - name: Test /ping in dev
+        run: |
+          response=$(curl -s http://localhost:8000/ping)
+          if [[ "$response" != '{"message":"pong"}' ]]; then
+            echo "/ping in dev: expected pong, got $response"
+            exit 1
+          fi
+
+      - name: Test /visits in dev (must be -1)
+        run: |
+          response=$(curl -s http://localhost:8000/visits)
+          if [[ "$response" != '{"visits":-1}' ]]; then
+            echo "/visits in dev: expected -1, got $response"
+            exit 1
+          fi
+
+      - name: Show dev logs on failure
+        if: failure()
+        run: |
+          docker compose -f docker-compose.yml -f docker-compose.dev.yml logs

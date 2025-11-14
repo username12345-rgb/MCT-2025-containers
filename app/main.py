@@ -3,6 +3,8 @@ import psycopg2
 import redis
 import os
 
+DEV_MODE = os.getenv("DEV_MODE", "false").lower() == "true"
+
 app = FastAPI()
 
 DB_HOST = os.getenv("DB_HOST", "db")
@@ -42,6 +44,9 @@ def ping(request: Request):
 
 @app.get("/visits")
 def visits():
+    
+    if DEV_MODE:
+        return {"visits": -1}
     r = get_redis_connection()
     cached = r.get("total_visits")
     if cached is not None:
